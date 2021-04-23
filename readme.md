@@ -1,18 +1,17 @@
 Mongo Sharded Cluster with Docker Compose
 =========================================
-A simple sharded Mongo Cluster with a replication factor of 2 running in `docker` using `docker-compose`.
+A simple sharded Mongo Cluster with a replication factor of 3 running in `docker` using `docker-compose`.
 
 Designed to be quick and simple to get a local or test environment up and running. Needless to say... DON'T USE THIS IN PRODUCTION!
 
-Heavily inspired by [https://github.com/jfollenfant/mongodb-sharding-docker-compose](https://github.com/jfollenfant/mongodb-sharding-docker-compose)
 
 ### Mongo Components
 
 * Config Server (3 member replica set): `config01`,`config02`,`config03`
-* 3 Shards (each a 2 member replica set):
-	* `shard01a`,`shard01b`
-	* `shard02a`,`shard02b`
-	* `shard03a`,`shard03b`
+* 3 Shards (each a 3 member replica set):
+	* `shard01a`,`shard01b`,`shard01c`
+	* `shard02a`,`shard02b`,`shard02c`
+	* `shard03a`,`shard03b`,`shard03c`
 * 1 Router (mongos): `router`
 * (TODO): DB data persistence using docker data volumes
 
@@ -34,30 +33,29 @@ This script has a `sleep 20` to wait for the config server and shards to elect t
 **Verify the status of the sharded cluster**
 
 ```
-docker-compose exec router mongo
+docker-compose exec router mongo localhost:27029
 mongos> sh.status()
---- Sharding Status ---
+--- Sharding Status --- 
   sharding version: {
-	"_id" : 1,
-	"minCompatibleVersion" : 5,
-	"currentVersion" : 6,
-	"clusterId" : ObjectId("5981df064c97b126d0e5aa0e")
-}
+  	"_id" : 1,
+  	"minCompatibleVersion" : 5,
+  	"currentVersion" : 6,
+  	"clusterId" : ObjectId("608296cc7f0ac2f2c21cb2f2")
+  }
   shards:
-	{  "_id" : "shard01",  "host" : "shard01/shard01a:27018,shard01b:27018",  "state" : 1 }
-	{  "_id" : "shard02",  "host" : "shard02/shard02a:27019,shard02b:27019",  "state" : 1 }
-	{  "_id" : "shard03",  "host" : "shard03/shard03a:27020,shard03b:27020",  "state" : 1 }
+        {  "_id" : "shard01",  "host" : "shard01/shard01a:27020,shard01b:27021,shard01c:27022",  "state" : 1 }
+        {  "_id" : "shard02",  "host" : "shard02/shard02a:27023,shard02b:27024,shard02c:27025",  "state" : 1 }
+        {  "_id" : "shard03",  "host" : "shard03/shard03a:27026,shard03b:27027,shard03c:27028",  "state" : 1 }
   active mongoses:
-	"3.4.6" : 1
- autosplit:
-	Currently enabled: yes
+        "4.4.5" : 1
+  autosplit:
+        Currently enabled: yes
   balancer:
-	Currently enabled:  yes
-	Currently running:  no
-		Balancer lock taken at Wed Aug 02 2017 14:17:42 GMT+0000 (UTC) by ConfigServer:Balancer
-	Failed balancer rounds in last 5 attempts:  0
-	Migration Results for the last 24 hours:
-		No recent migrations
+        Currently enabled:  yes
+        Currently running:  no
+        Failed balancer rounds in last 5 attempts:  0
+        Migration Results for the last 24 hours: 
+                No recent migrations
   databases:
 ```
 
@@ -68,7 +66,7 @@ The cluster only has to be initialized on the first run. Subsequent startup can 
 Its as simple as:
 
 ```
-docker-compose exec router mongo
+docker-compose exec router mongo localhost:27029
 ```
 
 ### Resetting the Cluster
